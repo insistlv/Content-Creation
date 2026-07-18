@@ -1,0 +1,11 @@
+name: Feature request
+description: 提议通用功能或改进
+body:
+  - type: textarea
+    id: problem
+    attributes: {label: 问题与使用场景}
+    validations: {required: true}
+  - type: textarea
+    id: proposal
+    attributes: {label: 建议方案}
+    validations: {required: true}

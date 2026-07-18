@@ -1,0 +1,37 @@
+@use './tokens.scss' as *;
+
+page {
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 0 0, rgba(255, 212, 229, 0.72), transparent 34%),
+    radial-gradient(circle at 100% 2%, rgba(204, 229, 255, 0.86), transparent 32%),
+    linear-gradient(180deg, #fff8fd 0%, #f7fbff 56%, #eef6ff 100%);
+  color: $ink;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+view,
+text,
+button,
+input,
+textarea {
+  box-sizing: border-box;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  line-height: 1.4;
+}
+
+button::after {
+  border: 0;
+}
+
+.safe-page {
+  min-height: 100vh;
+  padding-top: calc($phone-float-clearance-top + env(safe-area-inset-top));
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+}

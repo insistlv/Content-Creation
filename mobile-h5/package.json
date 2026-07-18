@@ -1,0 +1,50 @@
+{
+  "name": "image-agent-mobile-h5",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:h5": "uni -p h5",
+    "build:h5": "uni build -p h5",
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "build:mp-weixin": "uni build -p mp-weixin",
+    "build:mp-weixin:clean": "node scripts/build-mp-weixin-clean.mjs",
+    "lint:structure": "node scripts/check-structure.mjs",
+    "test:h5-contract": "node scripts/check-h5-contract.mjs",
+    "test:mp-build-contract": "node --test scripts/check-mp-build.test.mjs && node scripts/check-mp-build.mjs"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "vue3",
+    "@dcloudio/uni-app-plus": "vue3",
+    "@dcloudio/uni-components": "vue3",
+    "@dcloudio/uni-h5": "vue3",
+    "@dcloudio/uni-mp-weixin": "vue3",
+    "vue": "^3.5.13",
+    "vue-i18n": "^9.14.5"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "latest",
+    "@dcloudio/vite-plugin-uni": "vue3",
+    "sass": "^1.89.2",
+    "vite": "6.4.3"
+  },
+  "overrides": {
+    "@babel/core": "8.0.1",
+    "@intlify/core-base": "9.14.5",
+    "@intlify/message-compiler": "9.14.5",
+    "@intlify/message-resolver": "9.1.11",
+    "@intlify/runtime": "9.14.5",
+    "@intlify/vue-devtools": "9.14.5",
+    "adm-zip": "0.6.0",
+    "cookie": "0.7.2",
+    "express": "4.22.1",
+    "jpeg-js": "0.4.4",
+    "path-to-regexp": "0.1.13",
+    "phin": "3.7.1",
+    "postcss": "8.5.10",
+    "qs": "6.15.2",
+    "send": "0.19.1",
+    "serve-static": "1.16.2",
+    "ws": "8.21.1"
+  }
+}

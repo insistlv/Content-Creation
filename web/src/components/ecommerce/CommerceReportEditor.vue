@@ -1,0 +1,21 @@
+<script setup>
+import { computed, reactive, watch } from 'vue'
+import { CheckCircle2, Save } from 'lucide-vue-next'
+import { commerceFieldLabel } from './commerceDisplayLabels.js'
+const props = defineProps({ spec: { type: Object, default: null }, analyzing: Boolean, saving: Boolean, notice: String })
+const emit = defineEmits(['save', 'confirm', 'save-confirm', 'manual'])
+const overrides = reactive({})
+const content = reactive({ selling_points: '', forbidden_changes: '', brand_tone: '' })
+const baseFields = ['name', 'category', 'material']
+let baseline = '{}'
+const lines = value => Array.isArray(value) ? value.join('\n') : ''
+const toneText = value => typeof value === 'string' ? value : (value?.description || '')
+const payload = () => ({ user_overrides: { ...overrides }, selling_points: content.selling_points.split('\n').map(v=>v.trim()).filter(Boolean), forbidden_changes: content.forbidden_changes.split('\n').map(v=>v.trim()).filter(Boolean), brand_tone: content.brand_tone.trim() ? { description: content.brand_tone.trim() } : {} })
+watch(() => props.spec, (spec) => { Object.keys(overrides).forEach(key => delete overrides[key]); Object.assign(overrides, spec?.user_overrides || {}); content.selling_points=lines(spec?.selling_points); content.forbidden_changes=lines(spec?.forbidden_changes); content.brand_tone=toneText(spec?.brand_tone); baseline = JSON.stringify(payload()) }, { immediate: true })
+const editable = computed(() => props.spec && props.spec.status !== 'confirmed')
+const facts = computed(() => props.spec?.observed_facts || [])
+const fields = computed(() => [...new Set([...baseFields, ...(props.spec?.missing_fields || [])])])
+const failed = computed(() => ['analysis_failed', 'failed'].includes(props.spec?.status))
+const dirty = computed(() => JSON.stringify(payload()) !== baseline)
+</script>
+<template><section class="creator-step report-editor" aria-labelledby="report-heading"><header><span class="step-number">02</span><div><h2 id="report-heading">核对商品报告</h2><p>确认后才能配置详情页与预估点数。</p></div></header><div v-if="analyzing" class="report-skeleton" role="status"><span></span><span></span><span></span><p>AI 正在分析，可放心离开，任务会在后台继续。</p></div><div v-else-if="!spec" class="empty-state"><p>上传商品图并完成分析后，报告会显示在这里。</p><button v-if="notice" type="button" @click="emit('manual')">改为手工补录</button></div><template v-else><p v-if="notice" class="notice" role="status">{{ notice }}</p><div class="status-line"><span :class="`status-${spec.status}`">{{ spec.status === 'confirmed' ? '已确认' : failed ? '分析失败，可手工补录' : '待确认' }}</span><small>版本 {{ spec.version }}</small></div><div v-if="facts.length" class="facts"><h3>图片可验证事实</h3><ul><li v-for="(fact,index) in facts" :key="index"><b>{{ commerceFieldLabel(fact.field) }}</b><span>{{ fact.value }}</span><small>置信度 {{ Math.round((fact.confidence || 0) * 100) }}%</small></li></ul></div><div v-if="spec.missing_fields?.length" class="missing"><b>需要补充</b><span v-for="field in spec.missing_fields" :key="field">{{ commerceFieldLabel(field) }}</span></div><div class="report-form"><label v-for="field in fields" :key="field">{{ commerceFieldLabel(field) }}<input v-model="overrides[field]" :data-field="field" :disabled="!editable"/></label><label>品牌调性<input v-model="content.brand_tone" data-field="brand_tone" :disabled="!editable"/></label><label class="wide">核心卖点<textarea v-model="content.selling_points" data-field="selling_points" rows="3" :disabled="!editable"></textarea></label><label class="wide">禁改项<textarea v-model="content.forbidden_changes" data-field="forbidden_changes" rows="2" :disabled="!editable"></textarea></label></div><p v-if="dirty" class="notice">有未保存修改，确认时将先保存最新报告。</p><div v-if="spec.risk_notices?.length" class="risk"><b>风险提示</b><p v-for="risk in spec.risk_notices" :key="risk">{{ risk }}</p></div><div v-if="editable" class="report-actions"><button data-testid="commerce-report-save" type="button" :disabled="saving" @click="emit('save', payload())"><Save :size="17"/>保存修改</button><button data-testid="commerce-report-confirm" class="primary-action" type="button" :disabled="saving" @click="dirty ? emit('save-confirm', payload()) : emit('confirm')"><CheckCircle2 :size="17"/>{{ dirty ? '保存并确认' : '确认报告' }}</button></div></template></section></template>

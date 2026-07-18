@@ -1,0 +1,29 @@
+{
+  "name": "image-agent-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:e2e": "node ./scripts/run-e2e.mjs",
+    "test:e2e:smoke": "node ./scripts/run-e2e.mjs --project=smoke"
+  },
+  "dependencies": {
+    "lucide-vue-next": "^1.0.0",
+    "mammoth": "^1.12.0",
+    "pdfjs-dist": "^6.0.227",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^26.1.0",
+    "vite": "^6.3.5",
+    "vitest": "^3.1.4"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "白霖共享",
+  "appid": "__UNI__IMAGE_AGENT",
+  "description": "创作者 AI 图片平台移动端",
+  "versionName": "0.1.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "h5": {
+    "router": {
+      "mode": "history",
+      "base": "/"
+    },
+    "title": "白霖共享"
+  },
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": false
+    },
+    "usingComponents": true
+  },
+  "app-plus": {
+    "safearea": {
+      "bottom": {
+        "offset": "auto"
+      }
+    }
+  }
+}

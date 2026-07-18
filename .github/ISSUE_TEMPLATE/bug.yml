@@ -1,0 +1,18 @@
+name: Bug report
+description: 报告可复现的问题（不要提交漏洞或密钥）
+body:
+  - type: markdown
+    attributes:
+      value: 安全漏洞请按 SECURITY.md 私下报告。
+  - type: input
+    id: version
+    attributes: {label: 版本, placeholder: v0.1.0 或 commit}
+    validations: {required: true}
+  - type: textarea
+    id: reproduce
+    attributes: {label: 复现步骤}
+    validations: {required: true}
+  - type: textarea
+    id: expected
+    attributes: {label: 预期与实际结果}
+    validations: {required: true}

@@ -1,0 +1,31 @@
+<script setup>
+import { computed, onMounted, reactive, ref } from 'vue'
+import { FolderTree, Plus, RefreshCw } from 'lucide-vue-next'
+import { api } from '../api/client.js'
+
+const loading = ref(false), saving = ref(false), error = ref(''), message = ref(''), items = ref([]), version = ref('')
+const editing = ref(null)
+const form = reactive({ level: 1, parent_id: null, name: '', aliases_text: '', sort_order: 10 })
+const roots = computed(() => items.value.filter(item => item.level === 1).sort((a,b) => a.sort_order - b.sort_order))
+const childrenOf = id => items.value.filter(item => item.parent_id === id).sort((a,b) => a.sort_order - b.sort_order)
+async function load() { loading.value = true; error.value = ''; try { const data = await api.listAdminCommerceCategories(); items.value = data.items || []; version.value = data.version || '' } catch (reason) { error.value = reason?.message || '商品品类加载失败' } finally { loading.value = false } }
+function openCreate(level, parentId = null) { editing.value = { mode: 'create' }; Object.assign(form, { level, parent_id: parentId, name: '', aliases_text: '', sort_order: 10 }) }
+function openEdit(item) { editing.value = { mode: 'edit', id: item.id }; Object.assign(form, { level: item.level, parent_id: item.parent_id || null, name: item.name, aliases_text: (item.aliases || []).join('、'), sort_order: item.sort_order }) }
+const input = () => ({ level: form.level, parent_id: form.parent_id || undefined, name: form.name.trim(), aliases: form.aliases_text.split(/[、,，]/).map(item => item.trim()).filter(Boolean), sort_order: Number(form.sort_order) || 0 })
+async function submit() { if (!form.name.trim()) return; saving.value = true; error.value = ''; try { if (editing.value.mode === 'create') await api.createAdminCommerceCategory(input()); else await api.patchAdminCommerceCategory(editing.value.id, input()); editing.value = null; message.value = '商品品类已保存'; await load() } catch (reason) { error.value = reason?.message || '商品品类保存失败' } finally { saving.value = false } }
+async function toggle(item) { try { await api.patchAdminCommerceCategory(item.id, { status: item.status === 'active' ? 'inactive' : 'active' }); await load() } catch (reason) { error.value = reason?.message || '状态更新失败' } }
+onMounted(load)
+</script>
+
+<template>
+  <main class="admin-page commerce-category-admin">
+    <header class="page-header"><div><p class="eyebrow">AI 电商配置</p><h1><FolderTree :size="26"/>商品品类</h1><p>维护面向中国用户的两级常用品类目录。目录版本：{{ version || '-' }}</p></div><div class="page-actions"><button type="button" :disabled="loading" @click="load"><RefreshCw :size="16"/>刷新</button><button data-testid="category-add-root" class="primary-button" type="button" @click="openCreate(1)"><Plus :size="16"/>新增一级品类</button></div></header>
+    <p v-if="error" class="error-message" role="alert">{{ error }}</p><p v-if="message" class="success-message" role="status">{{ message }}</p>
+    <section class="admin-panel category-tree"><p v-if="loading">正在加载商品品类…</p><article v-for="root in roots" :key="root.id" class="category-root"><header><div><b>{{ root.name }}</b><small>{{ (root.aliases || []).join('、') || '无搜索别名' }}</small></div><div><button type="button" @click="openCreate(2,root.id)">新增子类</button><button type="button" @click="openEdit(root)">编辑</button><button :data-testid="`category-toggle-${root.id}`" type="button" @click="toggle(root)">{{ root.status === 'active' ? '停用' : '恢复' }}</button></div></header><div class="category-children"><div v-for="child in childrenOf(root.id)" :key="child.id"><span><b>{{ child.name }}</b><small>{{ (child.aliases || []).join('、') }}</small></span><span><em :class="child.status">{{ child.status === 'active' ? '启用' : '停用' }}</em><button type="button" @click="openEdit(child)">编辑</button><button :data-testid="`category-toggle-${child.id}`" type="button" @click="toggle(child)">{{ child.status === 'active' ? '停用' : '恢复' }}</button></span></div></div></article></section>
+	<div v-if="editing" class="category-modal" role="dialog" aria-modal="true" aria-label="编辑商品品类"><form class="admin-panel" @submit.prevent="submit"><h2>{{ editing.mode === 'create' ? '新增商品品类' : '编辑商品品类' }}</h2><label>品类名称<input v-model="form.name" data-testid="category-form-name" maxlength="20"/></label><label>搜索别名<input v-model="form.aliases_text" placeholder="用顿号或逗号分隔，例如：水杯、保温杯"/></label><label>排序<input v-model.number="form.sort_order" type="number"/></label><div class="modal-actions"><button type="button" @click="editing=null">取消</button><button data-testid="category-form-submit" class="primary-button" type="button" :disabled="saving" @click="submit">{{ saving ? '保存中…' : '保存' }}</button></div></form></div>
+  </main>
+</template>
+
+<style scoped>
+.commerce-category-admin{padding:28px}.page-header,.page-header h1,.page-actions,.category-root>header,.category-root>header>div,.category-children>div,.category-children>div>span,.modal-actions{display:flex;align-items:center}.page-header{justify-content:space-between;gap:20px;margin-bottom:20px}.page-header h1{gap:10px;margin:4px 0}.page-header p{color:var(--admin-muted,#708090)}.page-actions{gap:8px}.category-tree{display:grid;gap:12px}.category-root{border:1px solid var(--admin-border,#dce2e8);border-radius:12px;overflow:hidden}.category-root>header{justify-content:space-between;padding:14px;background:rgba(127,127,127,.06)}.category-root>header>div{gap:8px}.category-root small,.category-children small{display:block;color:#83909c;font-size:12px}.category-children>div{justify-content:space-between;padding:11px 14px;border-top:1px solid var(--admin-border,#e2e7eb)}.category-children>div>span{gap:10px}.category-children em{font-style:normal;font-size:12px}.category-children em.active{color:#4f8a10}.category-children em.inactive{color:#a05656}.category-modal{position:fixed;z-index:100;inset:0;display:grid;place-items:center;background:#0008;padding:20px}.category-modal form{width:min(520px,100%);display:grid;gap:14px}.category-modal label{display:grid;gap:6px}.category-modal input{padding:10px;border:1px solid #ccd3da;border-radius:8px}.modal-actions{justify-content:flex-end;gap:8px}@media(max-width:700px){.commerce-category-admin{padding:16px}.page-header,.category-root>header{align-items:flex-start;flex-direction:column}.category-children>div{align-items:flex-start;gap:10px;flex-direction:column}}
+</style>

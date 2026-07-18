@@ -1,0 +1,64 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-build-security:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: image_agent
+          POSTGRES_PASSWORD: image_agent
+          POSTGRES_DB: image_agent_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 10s
+          --health-timeout 5s --health-retries 5
+    env:
+      TEST_DATABASE_URL: postgres://image_agent:image_agent@localhost:5432/image_agent_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-go@v7
+        with: {go-version: 1.26.5, cache: true}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            web/package-lock.json
+            mobile-h5/package-lock.json
+
+      - name: Go tests
+        run: |
+          go test ./internal/app -run 'TestSecretStore|TestPrepareAppSecrets|TestSecretSettingsResponse|TestLoadConfig|TestCreateInitialAdmin'
+          go test ./cmd/server ./cmd/admin ./cmd/secrets
+      - name: Go build
+        run: go build ./cmd/server ./cmd/admin ./cmd/secrets
+      - name: Go vulnerability scan
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.1.4 ./...
+      - name: Go dependency license check
+        run: go run github.com/google/go-licenses/v2@v2.0.1 check --ignore=image-agent ./cmd/server ./cmd/admin ./cmd/secrets
+
+      - name: Web install, audit, test and build
+        working-directory: web
+        run: npm ci && npm audit --audit-level=high && npm test && npm run build
+      - name: Mini app install and contract checks
+        working-directory: mobile-h5
+        run: npm ci && npm audit --audit-level=high && npm run test:h5-contract && npm run lint:structure && npm run build:mp-weixin:clean && npm run test:mp-build-contract
+
+      - name: Gitleaks working tree and full history
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Public snapshot policy
+        shell: bash
+        run: bash scripts/check-public-snapshot.sh

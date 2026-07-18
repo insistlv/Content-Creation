@@ -1,0 +1,2 @@
+<script setup>defineProps({ recipes: { type: Array, default: () => [] } })</script>
+<template><section class="commerce-card recipe"><h2>AI 生产</h2><div v-if="!recipes.length" role="status"><strong>生产方案尚未开放</strong><p>当前未注册可用生成方案，不会创建模拟生产任务。</p></div><ul v-else><li v-for="recipe in recipes" :key="recipe.key">{{ recipe.name || recipe.definition?.title || '未命名生成方案' }}</li></ul><p class="mobile-recipe-note">请在桌面端编辑生产方案</p></section></template>

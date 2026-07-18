@@ -1,0 +1,16 @@
+{
+  "libVersion": "3.15.1",
+  "projectname": "mobile-h5",
+  "setting": {
+    "urlCheck": false,
+    "coverView": true,
+    "lazyloadPlaceholderEnable": false,
+    "skylineRenderEnable": false,
+    "preloadBackgroundData": false,
+    "autoAudits": false,
+    "minified": false,
+    "minifyWXML": false,
+    "showShadowRootInWxmlPanel": true,
+    "compileHotReLoad": true
+  }
+}

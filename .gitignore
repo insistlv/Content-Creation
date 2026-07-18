@@ -1,0 +1,67 @@
+# Environment files
+.env
+.env.*
+*.env
+*.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+web/node_modules/
+mobile-h5/node_modules/
+
+# Build outputs
+web/dist/
+web/test-results/
+web/playwright-report/
+web/blob-report/
+web/e2e-results/
+mobile-h5/dist/
+mobile-h5/unpackage/
+videos/**/.hyperframes/
+videos/**/renders/
+/server
+/.cloudflare-trial-state.json
+
+# Runtime data and generated assets
+data/
+output/
+images/
+*.log
+*.db
+*.sqlite*
+*.sqlite3
+*.db-*
+*.dump
+*.sql.gz
+*.pid
+
+# Local secrets
+scripts/*.key
+scripts/*.pem
+/yuaunc.pem
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.cer
+/secrets/
+.secrets/
+
+# Local tooling and editor state
+.idea/
+.playwright-cli/
+mobile-h5/.playwright-cli/
+.agents/
+.claude/
+.superpowers/
+.codex
+.codex-*
+.cache/
+.worktrees/
+skills/
+logs/
+coverage/
+*.out
+.DS_Store

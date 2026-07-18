@@ -1,0 +1,33 @@
+{
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "postcss": true,
+    "minified": false,
+    "uglifyFileName": false,
+    "enhance": true,
+    "packNpmRelationList": [],
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    },
+    "useCompilerPlugins": false,
+    "minifyWXML": false
+  },
+  "compileType": "miniprogram",
+  "miniprogramRoot": "dist/build/mp-weixin",
+  "libVersion": "3.15.1",
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "folder",
+        "value": "static"
+      }
+    ],
+    "include": []
+  },
+  "appid": "wxa3cfa5e72e6ab08e",
+  "editorSetting": {}
+}

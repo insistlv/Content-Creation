@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: image_agent
+      POSTGRES_USER: image_agent
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets: [postgres_password]
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U image_agent -d image_agent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      args:
+        VITE_SOURCE_CODE_URL: ${VITE_SOURCE_CODE_URL:-https://github.com/your-org/image-agent}
+    depends_on:
+      postgres: {condition: service_healthy}
+    environment:
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8888}
+      LISTEN_ADDR: :8888
+      DATABASE_URL_FILE: /run/secrets/database_url
+      APP_SECRETS_MASTER_KEY_FILE: /run/secrets/app_secrets_master_key
+      STARTUP_DATABASE_MIGRATIONS: ${STARTUP_DATABASE_MIGRATIONS:-bootstrap}
+      STORAGE_TYPE: local
+    secrets: [database_url, app_secrets_master_key]
+    volumes: [app_data:/app/data]
+    ports: ["8888:8888"]
+
+secrets:
+  postgres_password: {file: ./secrets/postgres_password}
+  database_url: {file: ./secrets/database_url}
+  app_secrets_master_key: {file: ./secrets/app_secrets_master_key}
+
+volumes:
+  postgres_data:
+  app_data:
