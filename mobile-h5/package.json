@@ -26,7 +26,7 @@
     "@dcloudio/types": "latest",
     "@dcloudio/vite-plugin-uni": "vue3",
     "sass": "^1.89.2",
-    "vite": "6.4.3"
+    "vite": "8.1.5"
   },
   "overrides": {
     "@babel/core": "8.0.1",
