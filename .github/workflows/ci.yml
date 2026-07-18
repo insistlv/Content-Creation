@@ -52,6 +52,8 @@ jobs:
         run: npm ci && npm audit --audit-level=high && npm test && npm run build
       - name: Mini app install and contract checks
         working-directory: mobile-h5
+        env:
+          VITE_STATIC_ASSET_BASE_URL: https://assets.example.invalid/image-agent/mobile-h5/static
         run: npm ci && npm audit --audit-level=high && npm run test:h5-contract && npm run lint:structure && npm run build:mp-weixin:clean && npm run test:mp-build-contract
 
       - name: Gitleaks working tree and full history
