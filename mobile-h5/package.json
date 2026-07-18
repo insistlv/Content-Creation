@@ -20,7 +20,7 @@
     "@dcloudio/uni-h5": "vue3",
     "@dcloudio/uni-mp-weixin": "vue3",
     "vue": "^3.5.13",
-    "vue-i18n": "^9.14.5"
+    "vue-i18n": "^11.4.6"
   },
   "devDependencies": {
     "@dcloudio/types": "latest",
